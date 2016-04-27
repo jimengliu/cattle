@@ -144,6 +144,11 @@ public class Tables {
 	public static final io.cattle.platform.core.model.tables.HostTable HOST = io.cattle.platform.core.model.tables.HostTable.HOST;
 
 	/**
+	 * The table cattle.host_disk
+	 */
+	public static final io.cattle.platform.core.model.tables.HostDiskTable HOST_DISK = io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK;
+
+	/**
 	 * The table cattle.host_ip_address_map
 	 */
 	public static final io.cattle.platform.core.model.tables.HostIpAddressMapTable HOST_IP_ADDRESS_MAP = io.cattle.platform.core.model.tables.HostIpAddressMapTable.HOST_IP_ADDRESS_MAP;

@@ -1,7 +1,9 @@
 package io.cattle.platform.agent.server.resource.impl;
 
-import static io.cattle.platform.core.model.tables.HostTable.*;
-import static io.cattle.platform.core.model.tables.PhysicalHostTable.*;
+import static io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK;
+import static io.cattle.platform.core.model.tables.HostTable.HOST;
+import static io.cattle.platform.core.model.tables.PhysicalHostTable.PHYSICAL_HOST;
+
 import io.cattle.platform.agent.server.ping.dao.PingDao;
 import io.cattle.platform.agent.server.resource.AgentResourcesEventListener;
 import io.cattle.platform.agent.server.util.AgentConnectionUtils;
@@ -16,6 +18,7 @@ import io.cattle.platform.core.dao.IpAddressDao;
 import io.cattle.platform.core.dao.StoragePoolDao;
 import io.cattle.platform.core.model.Agent;
 import io.cattle.platform.core.model.Host;
+import io.cattle.platform.core.model.HostDisk;
 import io.cattle.platform.core.model.IpAddress;
 import io.cattle.platform.core.model.PhysicalHost;
 import io.cattle.platform.core.model.StoragePool;
@@ -38,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -193,6 +197,32 @@ public class AgentResourcesMonitorImpl implements AgentResourcesEventListener {
         }
     }
 
+    protected void setHostDisks(Host host, Object mapObj) {
+        @SuppressWarnings("unchecked")
+        Map<Object, Object> fileSystems = (Map<Object, Object>) CollectionUtils.getNestedValue(mapObj, "diskInfo", "fileSystems");
+        for (Entry<Object, Object> fs : fileSystems.entrySet()) {
+            Double capacity = (Double) CollectionUtils.getNestedValue(fs.getValue(), "capacity");
+            if (capacity == null) {
+                continue;
+            }
+
+            // only one disk can be returned since host_disk.name is unique
+            // within the same host
+            List<HostDisk> disks = objectManager.find(HostDisk.class, HOST_DISK.NAME, fs.getKey(), HOST_DISK.HOST_ID,
+                    host.getId(), HOST_DISK.REMOVED, null);
+
+            // if the entry(specific hostId and disk name) does not exist, then insert it into host_disk table
+            if (disks.size() == 0) {
+                //insert a row
+                objectManager.create(HostDisk.class, HOST_DISK.NAME, fs.getKey(),
+                        HOST_DISK.ACCOUNT_ID, host.getAccountId(), HOST_DISK.KIND, "disk",
+                        HOST_DISK.STATE, "active", HOST_DISK.TOTAL_SIZE, capacity,
+                        HOST_DISK.ALLOCATED_SIZE, 0,
+                        HOST_DISK.HOST_ID, host.getId());
+            }
+        }
+    }
+
     protected Map<String, Host> setHosts(Agent agent, AgentResources resources) {
         Map<String, Host> hosts = agentDao.getHosts(agent.getId());
 
@@ -224,6 +254,8 @@ public class AgentResourcesMonitorImpl implements AgentResourcesEventListener {
                     if (ObjectUtils.notEqual(value, existingValue)) {
                         if (ORCHESTRATE_FIELDS.contains(key)) {
                             orchestrate = true;
+                        } else if  (HostConstants.FIELD_INFO.equals(key)) {
+                            setHostDisks(host, value);
                         }
                         updates.put(key, value);
                     }
