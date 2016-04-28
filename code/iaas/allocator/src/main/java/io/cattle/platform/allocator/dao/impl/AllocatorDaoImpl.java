@@ -166,7 +166,8 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
     }
 
     protected void modifyDisk(long hostId, Instance instance, boolean add) {
-        List<InstanceDiskMap> instanceDiskMaps = objectManager.find(InstanceDiskMap.class, INSTANCE_DISK_MAP.INSTANCE_ID, instance.getId(), INSTANCE_DISK_MAP.REMOVED, null);
+        List<InstanceDiskMap> instanceDiskMaps = objectManager.find(InstanceDiskMap.class,
+                INSTANCE_DISK_MAP.INSTANCE_ID, instance.getId(), INSTANCE_DISK_MAP.REMOVED, null);
 
         for (InstanceDiskMap obj : instanceDiskMaps) {
             Disk disk = objectManager.loadResource(Disk.class, obj.getDiskId());
@@ -176,18 +177,23 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
             if (add && freeSize >= reserveSize) {
                 disk.setAllocatedSize(allocated + reserveSize);
                 objectManager.persist(disk);
-                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize,
-                        "+", allocated, allocated + reserveSize);
-                break;
-            } else if (!add && allocated >= reserveSize) {
+                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize, "+",
+                        allocated, allocated + reserveSize);
+
+                // mark instanceDiskMap active
+                obj.setState(CommonStatesConstants.ACTIVE);
+                objectManager.persist(obj);
+            } else if (!add && ((String) obj.getState()).toLowerCase().equals(CommonStatesConstants.ACTIVE)
+                    && allocated >= reserveSize) {
                 disk.setAllocatedSize(allocated - reserveSize);
                 objectManager.persist(disk);
-                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize,
-                        "-", allocated, allocated + reserveSize);
+                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize, "-",
+                        allocated, allocated + reserveSize);
             }
             if (!add) {
-                // we should remove the instance_disk_map entries, just set removed to true ? who will clean it up ?
-                objectManager.delete(obj);;
+                // we should remove the instance_disk_map entries, just set
+                // removed to true ? who will clean it up ?
+                objectManager.delete(obj);
             }
         }
     }

@@ -4,6 +4,7 @@ import static io.cattle.platform.core.model.tables.DiskTable.DISK;
 import static io.cattle.platform.core.model.tables.InstanceDiskMapTable.INSTANCE_DISK_MAP;
 import io.cattle.platform.allocator.service.AllocationAttempt;
 import io.cattle.platform.allocator.service.AllocationCandidate;
+import io.cattle.platform.core.constants.CommonStatesConstants;
 import io.cattle.platform.core.model.Disk;
 import io.cattle.platform.core.model.InstanceDiskMap;
 import io.cattle.platform.object.ObjectManager;
@@ -43,7 +44,7 @@ public class DiskSizeConstraint extends HardConstraint implements Constraint {
                             INSTANCE_DISK_MAP.DISK_ID, disk.getId(),
                             INSTANCE_DISK_MAP.RESERVE_SIZE, this.size,
                             INSTANCE_DISK_MAP.KIND, "instanceDiskMap",
-                            INSTANCE_DISK_MAP.STATE, "active");
+                            INSTANCE_DISK_MAP.STATE, CommonStatesConstants.INACTIVE);
                     oneGood = true;
                     break;
                 }
