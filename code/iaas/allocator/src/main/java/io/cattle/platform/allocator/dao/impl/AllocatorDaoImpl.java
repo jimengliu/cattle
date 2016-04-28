@@ -1,12 +1,13 @@
 package io.cattle.platform.allocator.dao.impl;
 
 import static io.cattle.platform.core.model.tables.AgentTable.AGENT;
-import static io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK;
+import static io.cattle.platform.core.model.tables.DiskTable.DISK;
 import static io.cattle.platform.core.model.tables.HostLabelMapTable.HOST_LABEL_MAP;
 import static io.cattle.platform.core.model.tables.HostTable.HOST;
 import static io.cattle.platform.core.model.tables.HostVnetMapTable.HOST_VNET_MAP;
 import static io.cattle.platform.core.model.tables.ImageStoragePoolMapTable.IMAGE_STORAGE_POOL_MAP;
 import static io.cattle.platform.core.model.tables.ImageTable.IMAGE;
+import static io.cattle.platform.core.model.tables.InstanceDiskMapTable.INSTANCE_DISK_MAP;
 import static io.cattle.platform.core.model.tables.InstanceHostMapTable.INSTANCE_HOST_MAP;
 import static io.cattle.platform.core.model.tables.InstanceLabelMapTable.INSTANCE_LABEL_MAP;
 import static io.cattle.platform.core.model.tables.InstanceTable.INSTANCE;
@@ -28,8 +29,9 @@ import io.cattle.platform.core.constants.CommonStatesConstants;
 import io.cattle.platform.core.constants.InstanceConstants;
 import io.cattle.platform.core.dao.GenericMapDao;
 import io.cattle.platform.core.model.Host;
-import io.cattle.platform.core.model.HostDisk;
+import io.cattle.platform.core.model.Disk;
 import io.cattle.platform.core.model.Instance;
+import io.cattle.platform.core.model.InstanceDiskMap;
 import io.cattle.platform.core.model.InstanceHostMap;
 import io.cattle.platform.core.model.Nic;
 import io.cattle.platform.core.model.Port;
@@ -164,50 +166,28 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
     }
 
     protected void modifyDisk(long hostId, Instance instance, boolean add) {
-        /*
-         * TODO : This method now has to recalculate everything in case there
-         * are multiple disks exist in a single host, in order to find out which
-         * disk allocated_size to modify. Future we need to store that info
-         * inside candiate's host
-         */
+        List<InstanceDiskMap> instanceDiskMaps = objectManager.find(InstanceDiskMap.class, INSTANCE_DISK_MAP.INSTANCE_ID, instance.getId(), INSTANCE_DISK_MAP.REMOVED, null);
 
-        @SuppressWarnings("unchecked")
-        Map<String, String> labels = DataAccessor.fields(instance).withKey(InstanceConstants.FIELD_LABELS)
-                .as(Map.class);
-        if (labels == null) {
-            return;
-        }
-
-        String labelValue = null;
-        Long labelSize = 0L;
-        for (Map.Entry<String, String> labelEntry : labels.entrySet()) {
-            String labelKey = labelEntry.getKey();
-            if (labelKey.startsWith("io.rancher.scheduler.disksize")) {
-                labelValue = labelEntry.getValue();
-                labelSize = Long.parseLong(labelValue.replaceAll("[^0-9]", ""));
-
-                // Do we need to support more than one disksize label? Which means more than one
-                // volumes attached to a container
-                break;
-            }
-        }
-
-        // if no disksize label exists, so nothing to modify and just return
-        if (labelValue == null) {
-            return;
-        }
-
-        List<HostDisk> disks = objectManager.find(HostDisk.class, HOST_DISK.HOST_ID, hostId, HOST_DISK.REMOVED, null);
-
-        for (HostDisk disk : disks) {
+        for (InstanceDiskMap obj : instanceDiskMaps) {
+            Disk disk = objectManager.loadResource(Disk.class, obj.getDiskId());
+            Long reserveSize = obj.getReserveSize();
             Long allocated = disk.getAllocatedSize();
             Long freeSize = disk.getTotalSize() - disk.getAllocatedSize();
-            if (freeSize >= labelSize) {
-                disk.setAllocatedSize(allocated + labelSize);
+            if (add && freeSize >= reserveSize) {
+                disk.setAllocatedSize(allocated + reserveSize);
                 objectManager.persist(disk);
-                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), labelSize,
-                        add ? "+" : "-", allocated, allocated + labelSize);
+                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize,
+                        "+", allocated, allocated + reserveSize);
                 break;
+            } else if (!add && allocated >= reserveSize) {
+                disk.setAllocatedSize(allocated - reserveSize);
+                objectManager.persist(disk);
+                log.debug("allocated disk space on disk [{}], {} {} {} = {}", disk.getName(), reserveSize,
+                        "-", allocated, allocated + reserveSize);
+            }
+            if (!add) {
+                // we should remove the instance_disk_map entries, just set removed to true ? who will clean it up ?
+                objectManager.delete(obj);;
             }
         }
     }
@@ -301,7 +281,7 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
             Boolean done = data.as(Boolean.class);
             if ( done == null || ! done.booleanValue() ) {
                 modifyCompute(map.getHostId(), instance, true);
-
+                modifyDisk(map.getHostId(), instance, false);
                 data.set(true);
                 objectManager.persist(map);
             }

@@ -1,10 +1,11 @@
 package io.cattle.platform.allocator.constraint;
 
-import static io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK;
-
+import static io.cattle.platform.core.model.tables.DiskTable.DISK;
+import static io.cattle.platform.core.model.tables.InstanceDiskMapTable.INSTANCE_DISK_MAP;
 import io.cattle.platform.allocator.service.AllocationAttempt;
 import io.cattle.platform.allocator.service.AllocationCandidate;
-import io.cattle.platform.core.model.HostDisk;
+import io.cattle.platform.core.model.Disk;
+import io.cattle.platform.core.model.InstanceDiskMap;
 import io.cattle.platform.object.ObjectManager;
 
 import java.util.List;
@@ -30,11 +31,19 @@ public class DiskSizeConstraint extends HardConstraint implements Constraint {
 
             // we will get a bunch of disks for that host and we need at least one disk with
             // free space large enough
-            List<HostDisk> disks = objectManager.find(HostDisk.class, HOST_DISK.HOST_ID, hostId, HOST_DISK.REMOVED,
+            List<Disk> disks = objectManager.find(Disk.class, DISK.HOST_ID, hostId, DISK.REMOVED,
                     null);
-            for (HostDisk disk : disks) {
+            for (Disk disk : disks) {
                 Long freeSize = disk.getTotalSize() - disk.getAllocatedSize();
+
                 if (freeSize >= this.size) {
+                    
+                    // add a row in instance_disk_map with this instance and this disk to allocate
+                    objectManager.create(InstanceDiskMap.class, INSTANCE_DISK_MAP.INSTANCE_ID, attempt.getInstanceId(),
+                            INSTANCE_DISK_MAP.DISK_ID, disk.getId(),
+                            INSTANCE_DISK_MAP.RESERVE_SIZE, this.size,
+                            INSTANCE_DISK_MAP.KIND, "instanceDiskMap",
+                            INSTANCE_DISK_MAP.STATE, "active");
                     oneGood = true;
                     break;
                 }

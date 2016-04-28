@@ -11,7 +11,7 @@ package io.cattle.platform.core.model;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CattleTable extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1505402290;
+	private static final long serialVersionUID = 1641616029;
 
 	/**
 	 * The singleton instance of <code>cattle</code>
@@ -49,6 +49,7 @@ public class CattleTable extends org.jooq.impl.SchemaImpl {
 			io.cattle.platform.core.model.tables.DataTable.DATA,
 			io.cattle.platform.core.model.tables.DatabasechangelogTable.DATABASECHANGELOG,
 			io.cattle.platform.core.model.tables.DatabasechangeloglockTable.DATABASECHANGELOGLOCK,
+			io.cattle.platform.core.model.tables.DiskTable.DISK,
 			io.cattle.platform.core.model.tables.DynamicSchemaTable.DYNAMIC_SCHEMA,
 			io.cattle.platform.core.model.tables.DynamicSchemaRoleTable.DYNAMIC_SCHEMA_ROLE,
 			io.cattle.platform.core.model.tables.EnvironmentTable.ENVIRONMENT,
@@ -60,13 +61,13 @@ public class CattleTable extends org.jooq.impl.SchemaImpl {
 			io.cattle.platform.core.model.tables.HealthcheckInstanceTable.HEALTHCHECK_INSTANCE,
 			io.cattle.platform.core.model.tables.HealthcheckInstanceHostMapTable.HEALTHCHECK_INSTANCE_HOST_MAP,
 			io.cattle.platform.core.model.tables.HostTable.HOST,
-			io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK,
 			io.cattle.platform.core.model.tables.HostIpAddressMapTable.HOST_IP_ADDRESS_MAP,
 			io.cattle.platform.core.model.tables.HostLabelMapTable.HOST_LABEL_MAP,
 			io.cattle.platform.core.model.tables.HostVnetMapTable.HOST_VNET_MAP,
 			io.cattle.platform.core.model.tables.ImageTable.IMAGE,
 			io.cattle.platform.core.model.tables.ImageStoragePoolMapTable.IMAGE_STORAGE_POOL_MAP,
 			io.cattle.platform.core.model.tables.InstanceTable.INSTANCE,
+			io.cattle.platform.core.model.tables.InstanceDiskMapTable.INSTANCE_DISK_MAP,
 			io.cattle.platform.core.model.tables.InstanceHostMapTable.INSTANCE_HOST_MAP,
 			io.cattle.platform.core.model.tables.InstanceLabelMapTable.INSTANCE_LABEL_MAP,
 			io.cattle.platform.core.model.tables.InstanceLinkTable.INSTANCE_LINK,

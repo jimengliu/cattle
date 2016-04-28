@@ -89,6 +89,11 @@ public class Tables {
 	public static final io.cattle.platform.core.model.tables.DatabasechangeloglockTable DATABASECHANGELOGLOCK = io.cattle.platform.core.model.tables.DatabasechangeloglockTable.DATABASECHANGELOGLOCK;
 
 	/**
+	 * The table cattle.disk
+	 */
+	public static final io.cattle.platform.core.model.tables.DiskTable DISK = io.cattle.platform.core.model.tables.DiskTable.DISK;
+
+	/**
 	 * The table cattle.dynamic_schema
 	 */
 	public static final io.cattle.platform.core.model.tables.DynamicSchemaTable DYNAMIC_SCHEMA = io.cattle.platform.core.model.tables.DynamicSchemaTable.DYNAMIC_SCHEMA;
@@ -144,11 +149,6 @@ public class Tables {
 	public static final io.cattle.platform.core.model.tables.HostTable HOST = io.cattle.platform.core.model.tables.HostTable.HOST;
 
 	/**
-	 * The table cattle.host_disk
-	 */
-	public static final io.cattle.platform.core.model.tables.HostDiskTable HOST_DISK = io.cattle.platform.core.model.tables.HostDiskTable.HOST_DISK;
-
-	/**
 	 * The table cattle.host_ip_address_map
 	 */
 	public static final io.cattle.platform.core.model.tables.HostIpAddressMapTable HOST_IP_ADDRESS_MAP = io.cattle.platform.core.model.tables.HostIpAddressMapTable.HOST_IP_ADDRESS_MAP;
@@ -177,6 +177,11 @@ public class Tables {
 	 * The table cattle.instance
 	 */
 	public static final io.cattle.platform.core.model.tables.InstanceTable INSTANCE = io.cattle.platform.core.model.tables.InstanceTable.INSTANCE;
+
+	/**
+	 * The table cattle.instance_disk_map
+	 */
+	public static final io.cattle.platform.core.model.tables.InstanceDiskMapTable INSTANCE_DISK_MAP = io.cattle.platform.core.model.tables.InstanceDiskMapTable.INSTANCE_DISK_MAP;
 
 	/**
 	 * The table cattle.instance_host_map
