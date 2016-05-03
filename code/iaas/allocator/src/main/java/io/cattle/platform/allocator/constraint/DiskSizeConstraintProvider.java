@@ -33,16 +33,17 @@ public class DiskSizeConstraintProvider implements AllocationConstraintsProvider
 
         for (Map.Entry<String, String> labelEntry : labels.entrySet()) {
             String labelKey = labelEntry.getKey();
-            if (labelKey.startsWith("io.rancher.scheduler.disksize")) {
+            if (labelKey.startsWith("io.rancher.scheduler.disksize.")) {
                 String labelValue = labelEntry.getValue();
-                constraints.add(new DiskSizeConstraint(labelValue, objectManager));
+                String key = labelKey.substring("io.rancher.scheduler.disksize.".length());
+                constraints.add(new DiskSizeConstraint(key, labelValue, objectManager));
             }
         }
     }
 
     @Override
     public boolean isCritical() {
-        return false;
+        return true;
     }
 
 }
