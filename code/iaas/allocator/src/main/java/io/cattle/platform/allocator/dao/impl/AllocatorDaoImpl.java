@@ -23,7 +23,7 @@ import io.cattle.platform.allocator.dao.AllocatorDao;
 import io.cattle.platform.allocator.service.AllocationAttempt;
 import io.cattle.platform.allocator.service.AllocationCandidate;
 import io.cattle.platform.allocator.service.CacheManager;
-import io.cattle.platform.allocator.service.ManagedDiskInfo;
+import io.cattle.platform.allocator.service.DiskInfo;
 import io.cattle.platform.allocator.service.DiskReserveInfo;
 import io.cattle.platform.allocator.service.InstanceInfo;
 import io.cattle.platform.allocator.util.AllocatorUtils;
@@ -167,7 +167,8 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
     }
 
     protected void modifyDisk(long hostId, Instance instance, boolean add) {
-        InstanceInfo instanceInfo = CacheManager.getInstanceInfoForHost(hostId, instance.getId());
+        CacheManager cm = CacheManager.getCacheManagerInstance(this.objectManager);
+        InstanceInfo instanceInfo = cm.getInstanceInfoForHost(hostId, instance.getId());
 
         for (Entry<String, DiskReserveInfo> entry : instanceInfo.getAllReservedDisksInfo()) {
             String diskDevicePath = entry.getKey();
@@ -175,7 +176,7 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
             Long reserveSize = reserveInfo.getReservedSize();
             
             // figure out available size
-            ManagedDiskInfo diskInfo = CacheManager.getDiskInfoForHost(hostId, diskDevicePath);
+            DiskInfo diskInfo = cm.getDiskInfoForHost(hostId, diskDevicePath);
             Long allocated = diskInfo.getAllocatedSize();
             Long capacity = diskInfo.getCapacity();
             if (add && (capacity - allocated >= reserveSize)) {

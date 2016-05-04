@@ -197,33 +197,6 @@ public class AgentResourcesMonitorImpl implements AgentResourcesEventListener {
         }
     }
 
-    protected void setDisks(Host host, Object mapObj) {
-        @SuppressWarnings("unchecked")
-        Map<Object, Object> fileSystems = (Map<Object, Object>) CollectionUtils.getNestedValue(mapObj, "diskInfo", "fileSystems");
-        for (Entry<Object, Object> fs : fileSystems.entrySet()) {
-            Double capacity = (Double) CollectionUtils.getNestedValue(fs.getValue(), "capacity");
-            if (capacity == null) {
-                continue;
-            }
-
-            // only one disk can be returned since DISK.name is unique
-            // within the same host
-            List<Disk> disks = objectManager.find(Disk.class, DISK.NAME, fs.getKey(), DISK.HOST_ID,
-                    host.getId(), DISK.REMOVED, null);
-
-            // if the entry(specific hostId and disk name) does not exist, then insert it into DISK table
-            if (disks.size() == 0) {
-                //insert a row
-                objectManager.create(Disk.class, DISK.NAME, fs.getKey(),
-                        DISK.KIND, "disk",
-                        DISK.STATE, "active",
-                        DISK.TOTAL_SIZE, capacity,
-                        DISK.ALLOCATED_SIZE, 0,
-                        DISK.HOST_ID, host.getId());
-            }
-        }
-    }
-
     protected Map<String, Host> setHosts(Agent agent, AgentResources resources) {
         Map<String, Host> hosts = agentDao.getHosts(agent.getId());
 
@@ -255,8 +228,6 @@ public class AgentResourcesMonitorImpl implements AgentResourcesEventListener {
                     if (ObjectUtils.notEqual(value, existingValue)) {
                         if (ORCHESTRATE_FIELDS.contains(key)) {
                             orchestrate = true;
-                        } else if  (HostConstants.FIELD_INFO.equals(key)) {
-                            setDisks(host, value);
                         }
                         updates.put(key, value);
                     }

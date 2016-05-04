@@ -1,14 +1,14 @@
 package io.cattle.platform.allocator.service;
 
-public class ManagedDiskInfo {
+public class DiskInfo {
     private String diskDevicePath;
     private Long capacity;
     private Long allocatedSize;
 
-    public ManagedDiskInfo(String diskDevicePath, Long capacity) {
+    public DiskInfo(String diskDevicePath, Long capacity, Long used) {
         this.diskDevicePath = diskDevicePath;
         this.capacity = capacity;
-        this.allocatedSize = 0L;
+        this.allocatedSize = used;
     }
 
     public String getDiskDevicePath() {
