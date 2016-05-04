@@ -4,7 +4,7 @@ import io.cattle.platform.allocator.service.AllocationAttempt;
 import io.cattle.platform.allocator.service.AllocationCandidate;
 import io.cattle.platform.allocator.service.CacheManager;
 import io.cattle.platform.allocator.service.DiskInfo;
-import io.cattle.platform.allocator.service.DiskReserveInfo;
+import io.cattle.platform.allocator.service.InstanceDiskReserveInfo;
 import io.cattle.platform.allocator.service.HostInfo;
 import io.cattle.platform.allocator.service.InstanceInfo;
 import io.cattle.platform.object.ObjectManager;
@@ -61,7 +61,7 @@ public class DiskSizeConstraint extends HardConstraint implements Constraint {
             // we need to consider more than one volume constraints for this
             // container case. That means free size will subtract all reserved
             // size by other volumes as well beside allocated size.
-            DiskReserveInfo diskReserved = instanceInfo.getDiskReserveInfo(((DiskInfo)diskInfo).getDiskDevicePath());
+            InstanceDiskReserveInfo diskReserved = instanceInfo.getDiskReserveInfo(((DiskInfo)diskInfo).getDiskDevicePath());
             if (diskReserved != null) {
                 freeSize -= diskReserved.getReservedSize();
             }
@@ -70,7 +70,7 @@ public class DiskSizeConstraint extends HardConstraint implements Constraint {
                 if (diskReserved != null) {
                     diskReserved.addReservedSize(this.reserveSize);
                 } else {
-                    diskReserved = new DiskReserveInfo(((DiskInfo)diskInfo).getDiskDevicePath(), this.reserveSize, this.volumeName);
+                    diskReserved = new InstanceDiskReserveInfo(((DiskInfo)diskInfo).getDiskDevicePath(), this.reserveSize, this.volumeName);
                     instanceInfo.reserveDisk(diskReserved);
                 }
 

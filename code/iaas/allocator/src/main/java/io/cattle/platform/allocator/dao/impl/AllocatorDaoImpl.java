@@ -24,7 +24,7 @@ import io.cattle.platform.allocator.service.AllocationAttempt;
 import io.cattle.platform.allocator.service.AllocationCandidate;
 import io.cattle.platform.allocator.service.CacheManager;
 import io.cattle.platform.allocator.service.DiskInfo;
-import io.cattle.platform.allocator.service.DiskReserveInfo;
+import io.cattle.platform.allocator.service.InstanceDiskReserveInfo;
 import io.cattle.platform.allocator.service.InstanceInfo;
 import io.cattle.platform.allocator.util.AllocatorUtils;
 import io.cattle.platform.core.constants.CommonStatesConstants;
@@ -170,9 +170,9 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
         CacheManager cm = CacheManager.getCacheManagerInstance(this.objectManager);
         InstanceInfo instanceInfo = cm.getInstanceInfoForHost(hostId, instance.getId());
 
-        for (Entry<String, DiskReserveInfo> entry : instanceInfo.getAllReservedDisksInfo()) {
+        for (Entry<String, InstanceDiskReserveInfo> entry : instanceInfo.getAllReservedDisksInfo()) {
             String diskDevicePath = entry.getKey();
-            DiskReserveInfo reserveInfo = entry.getValue();
+            InstanceDiskReserveInfo reserveInfo = entry.getValue();
             Long reserveSize = reserveInfo.getReservedSize();
             
             // figure out available size

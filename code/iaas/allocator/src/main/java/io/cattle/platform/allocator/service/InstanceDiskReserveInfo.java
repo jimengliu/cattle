@@ -1,6 +1,6 @@
 package io.cattle.platform.allocator.service;
 
-public class DiskReserveInfo {
+public class InstanceDiskReserveInfo {
 
     private String diskDevicePath;
     private Long reservedSize;
@@ -15,7 +15,7 @@ public class DiskReserveInfo {
         this.allocated = allocated;
     }
 
-    public DiskReserveInfo(String diskDevicePath, Long reservedSize, String volumeName) {
+    public InstanceDiskReserveInfo(String diskDevicePath, Long reservedSize, String volumeName) {
         this.diskDevicePath = diskDevicePath;
         this.reservedSize = reservedSize;
         this.volumeName = volumeName;
