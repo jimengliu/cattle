@@ -178,8 +178,7 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
             // figure out available size
             DiskInfo diskInfo = cm.getDiskInfoForHost(hostId, diskDevicePath);
             Long allocated = diskInfo.getAllocatedSize();
-            Long capacity = diskInfo.getCapacity();
-            if (add && (capacity - allocated >= reserveSize)) {
+            if (add && (diskInfo.getCapacity() - allocated >= reserveSize)) {
                 diskInfo.addAllocatedSize(reserveSize);
                 log.debug("allocated disk space on disk [{}], {} {} {} = {}", diskInfo.getDiskDevicePath(), reserveSize, "+",
                         allocated, allocated + reserveSize);

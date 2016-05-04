@@ -34,11 +34,12 @@ public class InstancePurgePostListener extends AbstractObjectProcessLogic implem
 
         List<InstanceHostMap> instanceHostMappings = objectManager.find(InstanceHostMap.class,
                 INSTANCE_HOST_MAP.INSTANCE_ID,
-                instance.getId(),
-                INSTANCE_HOST_MAP.REMOVED, null);
+                instance.getId());
 
+        if (instanceHostMappings.size() == 0) {
+            return null;
+        }
         InstanceHostMap mapping = instanceHostMappings.get(0);
-
         CacheManager cm = CacheManager.getCacheManagerInstance(this.objectManager);
         HostInfo hostInfo = cm.getHostInfo(mapping.getHostId());
 
