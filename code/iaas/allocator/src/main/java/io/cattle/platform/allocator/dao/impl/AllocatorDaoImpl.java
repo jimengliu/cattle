@@ -190,6 +190,9 @@ public class AllocatorDaoImpl extends AbstractJooqDao implements AllocatorDao {
                 diskInfo.freeAllocatedSize(reserveSize);
                 log.debug("allocated disk space on disk [{}], {} {} {} = {}", diskInfo.getDiskDevicePath(), reserveSize, "-",
                         allocated, allocated + reserveSize);
+
+                // release the reserved disk for this instance
+                instanceInfo.releaseDisk(reserveInfo);
             }
         }
     }

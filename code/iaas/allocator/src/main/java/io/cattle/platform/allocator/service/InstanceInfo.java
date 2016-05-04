@@ -35,12 +35,10 @@ public class InstanceInfo {
         this.reserveDisks.put(diskReserveInfo.getDiskDevicePath(), diskReserveInfo);
     }
     
-    /*
     public void releaseDisk(DiskReserveInfo diskReserveInfo)
     {
-        this.reserveDisks.remove(diskInfo.getDiskDevicePath());
+        this.reserveDisks.remove(diskReserveInfo.getDiskDevicePath());
     }
-    */
     
     public DiskReserveInfo getDiskReserveInfo(String diskDevicePath)
     {

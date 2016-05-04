@@ -9,7 +9,7 @@ import io.cattle.platform.engine.process.ProcessState;
 import io.cattle.platform.process.common.handler.AbstractObjectProcessLogic;
 import io.cattle.platform.util.type.Priority;
 
-public class HostRemovedPostListener extends AbstractObjectProcessLogic implements ProcessPostListener, Priority {
+public class HostRemovePostListener extends AbstractObjectProcessLogic implements ProcessPostListener, Priority {
 
     @Override
     public String[] getProcessNames() {
