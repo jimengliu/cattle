@@ -1,6 +1,5 @@
 package io.cattle.platform.agent.server.resource.impl;
 
-import static io.cattle.platform.core.model.tables.DiskTable.DISK;
 import static io.cattle.platform.core.model.tables.HostTable.HOST;
 import static io.cattle.platform.core.model.tables.PhysicalHostTable.PHYSICAL_HOST;
 
@@ -18,7 +17,6 @@ import io.cattle.platform.core.dao.IpAddressDao;
 import io.cattle.platform.core.dao.StoragePoolDao;
 import io.cattle.platform.core.model.Agent;
 import io.cattle.platform.core.model.Host;
-import io.cattle.platform.core.model.Disk;
 import io.cattle.platform.core.model.IpAddress;
 import io.cattle.platform.core.model.PhysicalHost;
 import io.cattle.platform.core.model.StoragePool;
@@ -41,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
